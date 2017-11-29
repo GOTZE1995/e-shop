@@ -1,0 +1,276 @@
+1.javaweb 中 应用程序的执行流程 
+	用户向服务器发送请求
+2. 什么是servlet?
+ 	(1) 本质上是一个类 实现了 servlet的接口 
+	（2） 功能 ：处理请求 request ，返回响应 response 
+3. 如何在 Tommat 中手动部署 servlet 程序 
+4.servlet 避免使用属性 使用局部变量 
+5.servlet 生命周期  servlet 就new 一个 所有人访问的时候就访问这一个  init（） 方法只执行一次 在初始化的时候 
+	destory  webapp 退出的时候 
+	（1）加载 classoloder （2实例化）new 对象  （3） 初始化 init（servletconfig config）（4）处理请求 service 
+	doget dopost  （5）退出服务 destory（）
+	servletconfig：
+
+6. 非分布式的情况下  一个服务器上只有一个 servlet实例 
+7. request 对象 封装客户端到服务器端的一个请求
+
+8.  获取servlet参数 （先获取 servletconfig）再从 servletconfig对象中获取参数（用getinitparamenter）
+9.全局的参数 是通过servletcontext 对象获取 
+
+10.respones.setcontentype("test/html;charset=gb2312"); 类型是html文件格式 编码类型是GB2312
+
+11. enumberation 旧的iterator 接口 
+
+12.cookie 服务器可以向客户端写内容（只能是文本文档） 客户端可以阻止  只能拿自己webapp写入的东西 
+	cookie分为 1.临时性的属于窗口还有子窗口（ctrl+n创建的就是）  2.属于文本的
+	一个servlet/jsp 设置的cookies 能够被同一个路径下面 或者是子路径下面的servlet/jsp读到
+	(路径指的是你设置的虚拟路径~ 路径！= 真实路径) 
+	
+
+13.cookie 以“名-值”对的形式进行保存数据  
+	{
+	setname() setvalue() setmaxage() 
+	利用 httpservletresponse 的 addcookie()方法设置到客户端 vbv
+	利用 httpservletresquest 的 getcookie() 方法获取到客户端的所有cookie 
+	设置 cookie 
+}
+
+14 session  记录到服务器端的  是关联到浏览器的窗口
+	两种实现方式 {
+		通过cookie 实现 （创建session时 会把 session id 保存到cookies 中 ）---》浏览器支持cookie
+		通过url重写实现 （
+			respones.encodeURl -->1.转码 2.URL后面加上 session id		
+				） ---》如果浏览器不支持cookie 必须自己编程使用URL重写的方式实现
+		web.xml 可以设置过期时间  <session time-out>30</session time-out>
+	方法：  getLastAccessedTime getcreationTime--->long类型（包装成Date类型 才能好看） getrequestsessionId 
+		request.getSession(true)--》没有就创建一个 有就拿来用 
+	里的name：都是String类型   session.setattribute(string name,value)
+	session 不像cookie拥有路径访问的问题 
+	 	同一个application下 的servlet/jsp 可以共享session 前提是同一个客户端窗口 
+	
+}
+
+15.  javabean: 一个普通java类  属性是private 一般具有get set 方法 不应具有GUI表现 
+
+16.
+	response.setcharacterEncording("gb2312");
+	连接数据库 (web-INF/lib 下面放mysql的jar包){
+		try{
+		      class.forname("com.mysql.jdbc.Driver");
+		      Connection conn = DriverManager.getConnection("jdbc:mysql：//localhost/mydata?user=root&password=root");
+		      stmt = conn.CreateStatement();
+		      ResultSet rs = stmt.executeQuery("select * from artical");
+		while(rs.next()){
+			out.print(re.getString("title"))
+		}		
+		
+	}
+	point: 一般都是写到一个类中  相当于使用bean 
+	public class DB{
+		public static Connection getConn(){}
+		public static getStatement(Connection conn){}
+		public static ResultSet getResultSet(Statement stmt ,String SQL){}
+		public static void close(重载)；
+		
+		.......
+	}
+	通过这个类调用
+}
+
+17. serlet 总结{
+	从httpserlet继承 
+	重写 doget/dopost方法
+	在web.xml配置 （或者用注释的方法 ）
+	cookie、session、application 的概念
+	请求转发
+	使用javabean
+}
+
+18.----------------------------------------------JSP（就是一个servlet）------------------------------------------------
+（1） 拥有servlet的特点和优点 
+（2）直接在HTML里面内嵌JSP代码 
+（3）jsp程序 有JSP Engine 先将它转换成servlet 代码 接着将它编译成类文件载入执行 
+（4）只有当客户端第一次请求JSP时 ，才需要将其转换，编译
+优点: 平台无关性（只要支持JSP 的系统就行） 可扩展性 
+
+19. JSP的语法 ：
+{
+	传统语法：
+		Declaration
+	JSTL：
+	JSF：
+	其他tag（stucts）
+
+	Declaration{
+		 <%!> ---声明变量时 是成员变量 不加<%>是局部变量   exp： <%!> int accesscount =0;<%!>
+		<%> 里面不能声明方法 
+		${}自动从内置对象中查找值
+		<%=%>须明确指定从哪个对象里取值 --->直接输出出来 
+		例 <%=x%> 取当前页面的x 值
+		<%=request.getAttrbutr("x")%>取request中的x值
+		${x}首先从当前页面找有没有x，有就显示它，没有，查找request，再没有就查找session，再没有就查找application
+		再就有，就没办法了，输出空值
+		<%=x%>如果x不存在，会报错
+		${x}就算x不存在，也不会报错
+	}
+	Scriptlet{
+		注释（comment）：<%--%><%//%> <%/**/%>
+	}
+	
+	Directive（编译指令-》在编译期间运行）{
+		<%@Directive 属性=“”属性值“”%>
+		常见的的Directive：Page --》指明与 JSP container的 沟通方式 
+			page{ 
+				import（引入jar包语句）  errorpage=“erro.jsp”（当页面出错跳转到另一个页面）   iserropage contentype
+			} 
+		include file ="fileURL" --> 用于包含静态或者没交互的代码 限制：不能像flieURL传递参数 
+	}
+	ACTION（运行期间）-->可以传参数{
+		<jsp: include page = "URLspec" flush="true"/>
+		传参：<jsp： include page = "URLspec" flush="true">
+			<jsp : param name = "pn" value="pv">
+		          </jsp :include>
+		<jsp:forward> --->用于将一个jsp的内容传送到page 所指定的jsp程序 或者 servlet 中处理(url)
+		<jsp: forward page ="urlsperc " flush="true">
+			<jsp : param name = "pn" value="pv">
+		</jsp: forward>
+	!!!!! （都是跳转页面）<jsp:forward> 与 response.sendRedirect的区别   forward: 用的是同一个request 而send 是两次请求（request）
+		<jsp: useBean> 可以在jsp中 使用定义好的Bean--->不要使用裸体类
+		<jsp:useBean id="cd" class="bean.CountBean"></jsp:useBean>  == countBean cd = new CountBean();
+		<jsp:property name="cd" property="count" value="23"/> === cd.setcount(23)
+		usebean：属性 scope ：page  request application session 
+		<jsp:useBean id="对象实例的名字" scope="bean的作用范围 默认为page" class=“类的名称”type="实例的类型"
+		 <jsp:setPorperty name="xxx" property="xxx" param="xxx"-->你要设置的那个属性>
+		<jsp:getporperty name="XXX" property="xxx"> ---->可以获取属性 也可以获取方法（方法的话是通过反射机制实现的）
+	}
+	
+}
+
+20.Tomcat 下部署jsp站点   server.xml  reloadable="true"--->修改配置文件（web.xml）是无效的
+21.    eclipse 工作空间：org.eclipse.wst.sse.core ----》tomcat的工作目录
+22. jsp声明标签 <%!>  --->转换成servlet 的属性和方法    脚本标签<%>---》写的是java代码片段 
+          表达式标签 <%=>相当于 使用out.print()    动作标签 <jsp:action Name/> 注释标签 <%--11---%>
+	伪指令标签 <%@%>
+	表达式标签 --------------------------》 没有分号
+	<%String name = "header.jsp"%;>==
+	<jsp:include page = <%=name%>===<jsp include page="header.jsp"/>
+
+23.request.getResquestDispather("login.jsp").forward(resquest,response) ---页面跳转了 
+     request......................................................().include(resquest,response)---页面没有跳转 
+
+24 .反射机制 复习 
+
+25. 手动编码 ： String name  = request.getParameter("name");  out.println(new String(name.getBytes("ISO08859_1"-->原先的编码方式,"GBK")));
+
+26.jsp 内置对象  out(write print newline ) request(getparameter() getmethod() getparameterNames())
+		response(addcookie addheader containheader sendredirect setcontentyple )
+		appliction --->对应的类 servletcontext 
+27. servlet与 jsp 之间的通信 
+	jsp 通过jsp:forword 可以跳转任何页面 
+	servlet 如何调用 jsp  getservletconfig().getservletcontext().getRequestDispatcher("jsp页面路径").forward(req,resp); 
+
+-----------------数据库-------------------------eclipse 可以直接连接 数据库 ----------------------
+分页技术
+executequrey()--->好方法 
+查询  select top  100 *from book where id =222 not in (select top 200 id from book)--->从200-300记录开始查询
+
+JDBC编程步骤 --->要注意这里面使用try catch --》防止取数据出错时 关闭不了管道 
+1.load the Driver 
+	Class.forName("oracle.jdbc.driver.OracleDriver");  //---> 向drivermanage 注册 
+2.connect to the DataBase
+	Connection conn = DriverManager.getConnection("",用户名 ,密码) //---->创建一个连接
+3.执行SQL语句 
+	Statement stmt = conn.createStatement(); //----》得到一个sql语句对象  特殊的preparedStatement 
+	ResultSet rs = stmt.executeQuery("select ");//----》返回一个结果集 (相当于一个游标) // excuteUpdata
+4.show data
+	 while(rs.next){
+		System.out.print(rs.getString("deptno"));
+		rs.getInt("deptno");
+	}
+			//---->取出结果集的内容 （循环取出 ）
+4.关闭管道（后打开的先关）
+
+
+Statement 几个种类{
+	1.Statement 2. preparedStatement (简化插入过程)  3. callableStatement （专门调取存储过程）
+}
+
+JDBC 进阶{
+	灵活指定SQL语句中的变量----》preparedStatement 
+	对存储过程的调用 ------》 callableStatement
+	批处理------------》Batch { 
+				stmt.addbatch();
+				stmt.executeBatch();
+			         }
+	运用事务处理------》Transaction ----》 conn.setAutoCommit(false) && conn.rollback 
+		---->有多条语句 要同时进行提交的时候 （exp:转账信息）
+
+	可以前后移动的结果集-------》rs.previous() rs.absolute() rs.last() rs.getrow()--->返回值可以确定 一共有多少条记录 	
+			------- > 需要在Statment 初始化时  设置 resultset 的属性  对滚动敏不敏感 TYPE_SCROLL_INSENSITIVE ==== 
+	可以更新的结果集  rs.movetoinsertrow() rs.insertRow()  =====
+	DataSourse & RowSet   -----> datasourse 也是一个数据源 可以拿到跟数据库的连接 替代 DriverManager 支持分布式 
+			------》rowset  新的 resultset 从这里继承  支持断开的 结果集 支持JavaBean标准   
+}
+
+---------------------------MYSQL---------------------------------------------------
+ERROR 1366 (HY000): Incorrect string value: --------------->子非鱼
+
+!-!-! 我的mysql 对 逗号敏感 所以说 需要逗号单独的在一行  ！-！-！-！
+
+\. ---->运行sql的脚本文件  
+
+desc dept 看到表的结构 
+
+如何分页 ：select * from dept order by deptno desc limit 3,2;
+
+自动递增： id int primary key auto_increment  
+
+com.mysql.jdbc.driver 
+jdbc:mysql://localhost:/mydata?user=root&password=root 
+mysql -u root -p
+net start mysql
+\. 导入 
+.desc 表名;
+
+jar -cvf ***.war ./* 
+----------------------------------------------------------------
+
+28. base 标签  相当于加上 http 
+
+-----------------------------BBS--------------------------------------------------
+1.建表语句 要保留  .sql 
+
+2. jsp 会直接捕捉异常 
+
+3. form 表单中 用隐藏域 传递参数 
+
+4. Statement.RETRUN_GENERATED_KEYS 
+
+面向对象的设计模式： 一般先设计了类和对象 再设计数据库 
+
+5. WEB开发的一般流程 {
+	1.需求确定
+	2.分析和设计{
+		1.逻辑架构（3层架构，n层架构，MVC ---》（增加重用性））----
+		2.物理架构（web服务器分布  数据库服务器分布 ）----------------》架构分析和设计 
+ 		3.技术解决方案的确定 ---------------------------------------------
+		
+		1.需求的分析
+		2.业务逻辑设计
+		3.界面设计 
+	}
+	3.开发时 迅速开发原型 进行迭代开发 
+}
+
+设置邮件服务器
+得到session
+构造出一个邮件 
+send
+
+-------------------------------商城系统---------------------------------------------
+开发过程 {
+	先写用户 再写分类 然后写产品 接下来写购物 最后订单处理 
+}
+---------------------------------------------------------------------------------------
+
+java.beans ----->
