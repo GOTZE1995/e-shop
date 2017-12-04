@@ -1,0 +1,378 @@
+--------------------------Spring----------------------------------------
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+pagecontext.request.contextpath;
+href="/工程名/css/index.css"
+
+web.XML 配置  1.配置除了关于web 的配置文件  ---》applictionContext.xml  
+	2.配置监听器 Listener <listener>
+				<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+			</listener>
+	3.配置  servlet (--->这个对应了一个xml 文件---?spring-mvc.xml)
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring-mvc.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>  //判断载入的顺序 0或者1 0选择是加载 反之 
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+spring-mvc.xml 配置 
+	1.扫描controller <!-- 自动扫描且只扫描@Controller -->
+	2.<!-- 基于注解驱动的SpringMVC -->
+	3.<!-- 定义JSP文件的位置 -->
+
+applictionContext.xml 配置 
+	<description>Spring公共配置 </description>
+
+	1.<!-- 配置Spring上下文的注解 -->
+	<context:annotation-config />
+	2.<!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+	<context:component-scan base-package="com.myschool">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	
+	3.<!-- 属性文件位置 -->
+	<context:property-placeholder location="classpath:*.properties" />
+
+	
+
+
+DZHDFAAAEGrVQJFv
+基于注释的配置： import javax.annotation.Resource;
+
+import org.springframework.stereotype.Component;
+
+@Component 组件相当于定义了一个bean  @Resourse（name=“组件姓名”// type="组件类型"）
+
+动态代理 要实现 InvocationHandler 接口 
+
+spring aop  注解 实现 interceptorNames 中list 放通知  这些通知 实现不同的接口 可以实现 前置后置 还是 环绕通知
+
+实现MethodInterceptor 接口，在调用目标对象的方法时，就可以实现在调用方法之前、调用方法过程中、调用方法之后对其进行控制。
+MethodInterceptor 接口
+可以实现MethodBeforeAdvice接口、AfterReturningAdvice接口、ThrowsAdvice接口这三个接口能够所能够实现的功能，
+但是应该谨慎使用MethodInterceptor 接口，
+很可能因为一时的疏忽忘记最重要的MethodInvocation而造成对目标对象方法调用失效，或者不能达到预期的设想。
+
+
+<!-- 业务逻辑--> 实现接口的类  <bean id="***imlp" class="所在包"> </bean>
+<!-- 各类通知--> <bean id="***imlp" class="所在包"></bean>
+<!-- proxy bean --> <bean id ="要实现类的接口名+proxy"  class="org.springframework.aop.framework.ProxyFactoryBean">
+			        //实现了哪个接口 <property name="proxyInterfaces" value="service.UserService"></property>
+       				//实现了接口的类 <property name="target" ref="UserServiceImpl" />
+        				//通知器的名字  <property name="interceptorNames">
+          					 <list>
+               						 <value>Md5Advice</value>
+                					<value>ScoreAdvice</value>
+                					<value>RegistExceptionAdvice</value>
+                					<value>TimeAdvice</value>
+            					</list>
+        				</property>
+		</bean>
+
+	
+
+ 使用注解的方法 配置
+	<aop:aspectj-autoproxy />
+	<context:annotation-config />
+	<context:component-scan base-package="com" />
+
+Getmapping/Postmapping  =@RequestMapping( value = "/login", method = RequestMethod.GET/POST)
+
+web.xml --><context-parm>配置 applicationContext.xml 文件位置 指定listener 监听器 
+
+控制器作用： 接受客户请求 
+
+Spring提供了一组名为*Aware的接口，例如：
+BeanNameAware:获得Bean在配置文件中定义的名字
+BeanFactoryAware:获得BeanFactory对象，可用来检测Bean的作用域
+ApplicationContextAware: 获得ApplicationContext对象,可以用来获取所有Bean definition的名字
+ResourceLoaderAware:获得ResourceLoader对象，可以获得classpath中某个文件
+ServletContextAware:在一个MVC应用中可以获取ServletContext对象，可以读取context中的参数
+ServletConfigAware在一个MVC应用中可以获取ServletConfig对象，可以读取config中的参数
+
+@postconstruct @predestroy 
+Spring容器的工作就是创建Bean并注入他所依赖的Bean对象
+
+Spring设计了一个既方便又可以在所有层使用的Validator接口
+Spring提供了Validator接口来进行对对象的验证，该接口实现2个方法
+supports(Class)-判断该validator是否能校验提供的class的实例
+validate(Object, org.springframework.validation.Errors)- 校验给定的对象，如果有校验失败信息，将其放入Errors对象
+SpringMVC还支持声明式验证@Controller输入
+
+Springel
+它的语法类似于传统EL，但提供额外的功能，最出色的就是函数调用和简单字符串的模板函数
+虽然SpEL引擎作为Spring 组合里的表达式解析的基础 ，但它不直接依赖于Spring,可独立使用
+SpEL表达式可以与XML或基于注解的配置元数据使用定义
+定义表达式的语法形式：#{<表达式字符串>}
+
+@component 
+public class Computer {
+	@value("#{memey.memorynum}")
+	private int memorynum
+	@value("memey ")
+	private int memey 
+}
+
+动态注入：：：：：：：：：
+SpringEL允许开发者将一个对象的属性注入给另一个对象属性，也可以调用一个对象的方法，并将返回值注入给另一个对象的属性
+
+@component("computer")
+public class  Computer{
+	@value{"#{cpu.id()}"}
+	private int id;
+	@value{"#{cpu.name(2)}"}
+	private String name
+}
+
+@component("cpu")
+public class cpu{
+	public  int getid(){
+		return 1;
+	}
+
+	public String name(int id){
+	return id+inter;
+	}
+}
+	
+SpringEL允许开发者调用new关键字，实现构造方法调用，并实例化出对象 @value("#{new com.constructor.memory1()}")
+SpringEL支持对List、Properties、Map等集合的操作，还支持集合选择、集合投影等 @value("#{students.list[1]}")
+
+SpringEL集合选择
+.?[]可以设置筛选条件
+.^[]获取第一个匹配项
+.$[]获取最后一个匹配项
+
+选择
+@value("#{students.?[stuid>3]}")
+private List subList;
+
+投影
+@value("#{students.![stuname]}")
+private List nameList
+
+选择加投影 同理  students.?[stuid>3].![stuname]
+
+JDK1.3之后加入了实现动态代理的API
+InvocationHandler接口
+关键：使用Proxy.newProxyInstance()静态方法建立一个代理对象(建立代理对象必须告知要代理的接口)
+操作代理对象时会执行invoke()方法
+
+
+实现SpringAPI的传统方式
+经典的基于代理的AOP，适用于所有版本
+实现步骤：
+编写通知
+编写切点
+Spring自动创建代理对象
+
+spring-mvc  ----> 扫描顶级的包 
+spring-bean ---->扫描顶级包（非controller）
+
+
+----------------------------------------------------------------------------
+视图解析 
+viewresolver view 
+
+当客户端发出请求后，交由SpringMVC的DispatcherServlet处理，
+接着Spring会分析看哪一个HandlerMapping定义的所有请求映射中对该请求的最合理的映射，
+然后通过该HandlerMapping取得其对应的Handler
+接着再通过相应的HandlerAdapter处理该Handler，处理之后会返回一个ModelAndView对象
+
+viewresolver(视图解析器)
+InternalResourceViewResolver
+resourcebundleviewResolver    默认情况下这个配置文件是在classpath根目录下的views.properties
+jsp:所采用的 视图解析器 是 InternalResourceViewResolver and  ResourcebunndleViewResolver 
+
+BeanNameResolver 
+
+<c:set var="ctx" value="${pageContext.request.contextPath}" />  --->不需要理会 是绝对路径还是相对路径 
+
+
+Spring的表单标签，捆绑在spring-webmvc.jar中。这些标签库的描述符被称为spring-form.tld
+要使用该标签库，需要在JSP页面顶端配置：
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<form:form commandName="pro" action="/Springtags/product/add" method="post">
+<form:hiden path:"id"/></td>  path = html里面的name 
+<form:select path="province.id">
+	<form:option value="0" label="-----please select-------">
+	<form:option item="${pros}" itemvalue="id" itemLabel="name">
+<form:select>
+
+<bean class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
+	<property name="basename" value="views" />
+	<property name="order" value="1" />
+</bean>
+
+DispatcherServlet使用了专有的Bean来处理请求和渲染视图，
+可以在WebApplicationContext中进行配置，这些Bean包括：
+
+从Spring2.5以后，提供了一组注解用于SpringMVC的编程，
+比如：@Controller、@RequestMapping、@RequestParam等
+
+JdbcTemplate类是Spring对JDBC支持类库中的核心类
+JdbcTemplate负责：
+创建和释放资源
+执行SQL语句、存储过程，并通过ResultSet来返回数据
+
+和hibernate 进行整合
+ web.xml  content-param {param-name param-value -->这是不包含web的xml配置文件}
+	listener org.springframework.web.context.ContextLoaderListener
+	servlet {servlet-name servlet-class  init-param{param-name param-value{路径} }  }
+	servlet-mapping{ servlet-name url-pattern}
+	3个fliter()
+spring-bean {
+	1. 使用注解
+	2.datasourse 连接数据源 
+	3.sessionfactory 
+	4.定义事务 
+}
+---------------------------------------------------------------------------
+
+SSH{
+	
+}
+
+自定义分页标签 （.tag）
+缓存技术 ehcache、memcache (hibernate 二级缓存)
+一级缓存 session 
+memcache（启到seesion 共享）
+网页静态化
+缓存的命中率 
+
+
+
+--------------------------Hibernate--------------------------------------
+
+
+先建表 后建类 
+
+自己对自己得表（一对多） 级联菜单
+@entity @id@generatedValue(Strategy=AUTO，identity，increatement，foriegin)--->主键生成方式 
+
+jpa (java persistence api) annotation
+
+通过hibernate进行持久化时所需要的步骤
+
+ServiceRegistry
+SessionFactory
+Session
+Transaction
+
+Session是Hibernate持久操作的基础核心。
+Hibernate Session 与Hibernate相当于JDBC Connection与JDBC；
+它代表与数据库之间的一次连续操作；
+Session负责执行访问数据库的操作，比如保存、更新、删除、加载和查询，也称为持久化管理器。
+
+// 从 hibernate.cfg.xml 读取配置信息
+		StandardServiceRegistry registry  = new StandardServiceRegistryBuilder().configure().build();
+										
+		//创建session工厂
+		SessionFactory sessionfactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+										
+		//获取一个session
+		Session session = sessionfactory.openSession();
+
+		//开始一次事务 
+		Transaction tx= session.beginTransaction();
+		
+		//进行持久化操作 
+		
+		Student student = new Student();
+		student.setId(2014);
+		student.setName("ty");
+		student.setAge(22);
+		
+		session.save(student);//将对象持久化
+		tx.commit(); //提交事务
+		session.close(); // 关闭会话 
+
+
+持久化类采用 JavaBean 风格，为被访问的属性创建 setter 和 getter 方法，这两个方法被称为持久化类的访问方法。
+
+在对象-关系映射文件中<property>元素的 access 属性用于指定Hibernate访问持久化类属性的方式。
+property : 默认值，通过getter和setter方法访问属性值；
+field : 通过Java反射机制直接访问属性值
+
+content-assist-activation --->+@ 就会提示 
+
+测试驱动开发 
+
+O/R Mapping FrameWorks
+1.hibernate 
+2.toplink
+3.jdo
+4.ibatis
+5.jpa 
+
+auto increament---》mysql 
+Annotation
+注解加到get方法上 
+表名类名不一致{
+  @entity
+  @table()-->jpa中 
+  @column("")
+  @transient;--->不加人持久化 
+  @temporal -->日期 
+@enumerated -->枚举
+xml 生成器 uuid identity native sequence
+@generatedValue（AUTO IDENTITY SEQUENCE TABLE ） 默认AUTO相当于 native  (strategy=GenerationType.IDentity)
+@sequenceGenerator(name="teachersequence"  sequencename="xx_DB")--写在实体类上 {
+	@generatedValue（strategy=GenerationType.SEQUENCE  generator=“teachersequence”）
+}
+@javax.persisitence.TableGenerator()--->跨数据库平台用
+}
+联合主键{
+	主键pk那个类 实现serializable 接口 
+      	XML配置： composite-id 
+	Annotation配置：类加idclass  主键属性上 加@id ||  @idclass(xxpk.class->不需要写东西)  @id@id  
+}
+
+哈希表-->是个数组 
+
+standardserviceRegistry 读取配置信息
+metadataSources 数据源获取 sessionfactory
+sessionfactory getcurentsession 获取 session 
+COREAPI 和对象的三种状态 {
+	sessionfactory 维护的最重要的东西 就是数据库连接池 
+	sessionfactory.getcurrentSession()---》从上下文找 有就久的用久的 没有用新的  
+			用途：界定事务边界  不需要close tx.commit提交后就close了
+			XML:  hibernate.current_session_context_class ;--->属性有 thread jta 
+			JTA:   java transaction api 		
+	sessionfactory .opensession() 只拿新的	
+	
+	对象的三种状态 ： transient（内存中一个对象，没id 缓存也没有）  
+			persistent（内存中有 缓存有 数据库有 有ID）
+			 detached（内存有 缓存没有 数据库有 有ID）
+ 
+		主要区别：有没有id  ID在数据库中有没有  内存中有没有（session内存） 
+	Session 管理数据库的任务单元  save delete update 
+		get/load 	{
+			load返回的是代理对象 等到真正用到对象的内容才发出 sql  
+			get 是直接从数据库加载 不会延迟 
+		}
+	update： {
+		persistent状态的对象 只要设定不同的字段就会发生更新 
+		忘记：method1：在get属性上面 @column（updatable）
+		method2： XML <CLASS dynamic-update="true">
+		跨session merge
+		*推荐 @DynamicUpdate 设置true 
+	}
+	saveorupdate{}
+	clear{}
+}
+------------MyJuint-----------------------------------------------------------------
+@Test 
+@BeforeClass
+@Afterclass
+
